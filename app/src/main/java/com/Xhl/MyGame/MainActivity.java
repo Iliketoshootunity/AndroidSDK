@@ -10,6 +10,7 @@ public class MainActivity extends UnityPlayerActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         GameHelper.Init(this);
+        TencentQQ.Init(this);
     }
 
     @Override

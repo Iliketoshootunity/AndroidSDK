@@ -25,7 +25,7 @@ public class TencentQQ {
 
     private  static  BaseUiListener m_LoginCallBack;
 
-    private  static  void  Init(MainActivity activity)
+    public   static  void  Init(MainActivity activity)
     {
         Log.d(m_Tag,"QQ Init");
         m_Activity=activity;
@@ -161,7 +161,7 @@ public class TencentQQ {
                 byte[] data=ReadStream(inputStream);
                 String json=new String(data);
                 json =json.replace("(","").replace(")","").replace("callback","");
-                JSONObject jsonObj=new JSONObject("json");
+                JSONObject jsonObj=new JSONObject(json);
                 unionid =jsonObj.getString("unionid");
             }
         }

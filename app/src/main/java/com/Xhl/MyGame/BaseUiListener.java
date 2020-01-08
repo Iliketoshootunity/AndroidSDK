@@ -21,11 +21,11 @@ public class BaseUiListener implements  IUiListener  {
 
     @Override
     public void onError(UiError uiError) {
-
+        GameHelper.SendPlatformMsgToUnity(GameHelper.PLATFORM_MSG_QQLOGINCALLBACK,1,0,0,"","","");
     }
 
     @Override
     public void onCancel() {
-
+        GameHelper.SendPlatformMsgToUnity(GameHelper.PLATFORM_MSG_QQLOGINCALLBACK,2,0,0,"","","");
     }
 }
