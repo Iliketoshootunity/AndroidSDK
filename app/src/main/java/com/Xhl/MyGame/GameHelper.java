@@ -50,8 +50,10 @@ public class GameHelper {
                 TencentQQ.LogOut();
                 break;
             case PLATFORM_MSG_WXLOGIN:
+                TencentWX.Login();
                 break;
             case PLATFORM_MSG_WXLOGOUT:
+                TencentWX.LoginOut();
                 break;
 
         }
@@ -100,9 +102,9 @@ public class GameHelper {
             case PLATFORM_MSG_QQREFRESHSESSION:
                 return  TencentQQ.RefreshSession().toString();
             case  PLATFORM_MSG_WXCHECKVAILD:
-                break;
+                return String.valueOf(TencentWX.CheckAutorVaild()) ;
             case PLATFORM_MSG_WXREFRESHSESSION:
-                break;
+                return  TencentWX.RefreshSession().toString();
         }
         return "";
     }

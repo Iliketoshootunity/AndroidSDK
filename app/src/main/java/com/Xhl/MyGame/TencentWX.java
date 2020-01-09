@@ -20,7 +20,7 @@ public class TencentWX {
     private  static  String AppId= "sssss";
     private  static  String AppSecret="ssdsdwdw";
 
-    public  void Init(MainActivity activity)
+    public static   void Init(MainActivity activity)
     {
         Log.d(m_Tag,"WX Init ");
         m_MainActivity=activity;
@@ -28,7 +28,7 @@ public class TencentWX {
         m_WXAPI.registerApp(AppId);
     }
 
-    public  void Login()
+    public  static void Login()
     {
         Log.d(m_Tag,"QQ Login");
         final SendAuth.Req req = new SendAuth.Req();
@@ -37,10 +37,100 @@ public class TencentWX {
         m_WXAPI.sendReq(req);
     }
 
+    public  static void LoginOut()
+    {
+        Log.i(m_Tag,"QQ LogOut");
+        m_WXAPI.unregisterApp();
+    }
 
-    protected  static  void  GetAccessToken (final
+    public  static  boolean CheckAutorVaild()
+    {
+        Log.i(m_Tag,"CheckAutorVaild");
+        try {
+            String rt=GetRefreshToken();
+            if(rt==null||rt=="")
+            {
+                return  false;
+            }
 
-                                             String wxcode)
+            URL url=new URL("https://api.weixin.qq.com/sns/oauth2/refresh_token?appid="+AppId+"&grant_type=refresh_token&refresh_token="+rt+"");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            //这是一个同步请求，可以直接得到结果
+            InputStream inputStream=connection.getInputStream();
+            byte[] data=ReadStream(inputStream);
+            String json=new String(data);
+            JSONObject jsonObj=new JSONObject(json);
+            if(jsonObj.has("errcode"))
+            {
+                Log.e(m_Tag,"CheckAutorVaild error:授权无效，需要重新授权");
+                return  false;
+            }
+            else
+            {
+                Log.d(m_Tag,"CheckAutorVaild error:授权有效效，不需要重新授权");
+                return  false;
+            }
+        }
+        catch (Exception e) {
+            Log.i(m_Tag, "CheckAutorVaild error: " + e.toString());
+        }
+        return  false;
+    }
+    //获取刷新票据
+    public  static  JSONObject RefreshSession()
+    {
+        Log.i(m_Tag,"RefreshSession");
+        try
+        {
+            String refreshToken=GetRefreshToken();
+            if(refreshToken==null||refreshToken=="")
+            {
+                return  null;
+            }
+            URL url=new URL("https://api.weixin.qq.com/sns/oauth2/refresh_token?appid="+AppId+"&grant_type=refresh_token&refresh_token="+refreshToken+"");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            //这是一个同步请求，可以直接得到结果
+            InputStream inputStream=connection.getInputStream();
+            byte[] data=ReadStream(inputStream);
+            String json=new String(data);
+            JSONObject jsonObj=new JSONObject(json);
+            if(!jsonObj.has("errcode"))
+            {
+                return  SetSelfData(jsonObj);
+            }
+        }
+        catch (Exception e)
+        {
+            Log.i(m_Tag,"RefreshSession" +e.toString());
+        }
+        return  null;
+
+    }
+
+    public  static  void  SaveRefreshToken(String token)
+    {
+        if(m_MainActivity!=null)
+        {
+            m_MainActivity.SaveRefreshToken(token);
+        }
+    }
+
+    public  static  String GetRefreshToken()
+    {
+        if(m_MainActivity!=null)
+        {
+          return   m_MainActivity.GetRefreshToken();
+        }
+        return  "";
+    }
+
+    public  static  void  GetAccessToken (final String wxcode)
     {
         new Thread(new Runnable() {
             @Override
@@ -85,7 +175,6 @@ public class TencentWX {
             String expires=jsonObj.getString("expires_in");
             String refreshtoken=jsonObj.getString("refresh_token");
             String openId=jsonObj.getString("openid");
-            String scope=jsonObj.getString("scope");
             String expirestime=jsonObj.getString("expires_in");
             String unionid=GetUnionid(token,openId);
 
@@ -98,6 +187,8 @@ public class TencentWX {
             obj.put("pf","");
             obj.put("pfkey","");
             obj.put("expirestime",expirestime);
+
+            SaveRefreshToken(refreshtoken);
 
             Log.d(m_Tag,"SetSelfData Data:"+obj.toString());
         }

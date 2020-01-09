@@ -1,6 +1,7 @@
 package com.Xhl.MyGame.wxapi;
 
 import android.app.Activity;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -9,6 +10,7 @@ import com.Xhl.MyGame.TencentQQ;
 import com.Xhl.MyGame.TencentWX;
 import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
+import com.tencent.mm.opensdk.modelmsg.SendAuth;
 import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
 
 public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
@@ -42,7 +44,9 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                 Log.d(m_Tag,"登陆成功");
                 if(type==1) //成功
                 {
-
+                    String code=((SendAuth.Resp)baseResp).code;
+                    Log.d(m_Tag,"登陆成功");
+                    TencentWX.GetAccessToken(code);
                 }
                 else if( type ==2) //分享
                 {
